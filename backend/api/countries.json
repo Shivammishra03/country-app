@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Canada",
+    "continent": "North America",
+    "rank": 2,
+    "imageUrl": "/images/canada.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Germany",
+    "continent": "Europe",
+    "rank": 1,
+    "imageUrl": "/images/germany.jpg"
+  },
+  {
+    "id": 3,
+    "name": "india",
+    "continent": "",
+    "rank": 15,
+    "imageUrl": "/images/f35424cf017377f7e38d9cf1f03e4ad9"
+  }
+]
