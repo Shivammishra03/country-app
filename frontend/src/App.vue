@@ -90,7 +90,7 @@ export default {
         .then(response => {
           this.countries.push(response.data);
           this.newCountry = { name: '', continent: '', rank: '' };
-          this.file = null;
+          this.file = "";
           this.fetchCountries();
         })
         .catch(error => {
