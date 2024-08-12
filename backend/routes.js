@@ -17,7 +17,7 @@ function writeData(data) {
 router.get('/countries', (req, res) => {
     const data = readData();
     const countriesData = data.countries
-    const countries = countriesData.map(country => ({ id: country.id, name: country.name }));
+    const countries = countriesData.map(country => ({ id: country.id, name: country.name, continent:country.continent }));
     res.json(countries);
 });
 

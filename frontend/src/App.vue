@@ -1,10 +1,70 @@
+<script setup>
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
+
+const countries = ref([]);
+const selectedCountryId = ref(null);
+const countryDetails = ref(null);
+const newCountry = ref({
+  name: '',
+  continent: '',
+  rank: '',
+});
+const uniqueContinents = ref([]);
+const file = ref('');
+
+const fetchCountries = async () => {
+  await axios.get('http://localhost:8080/api/countries').then(response => {
+    countries.value = response.data;
+    uniqueContinents.value = [...new Set(countries.value.map(c => c.continent))];
+  }).catch(error => console.error(error));
+};
+const fetchCountryDetails = async () => {
+  if (!selectedCountryId.value) return;
+  await axios.get(`http://localhost:8080/api/country/${selectedCountryId.value}`).then(response => {
+    countryDetails.value = response.data;
+  }).catch(error => console.error(error));
+};
+const addCountry = async () => {
+  const formData = new FormData();
+  formData.append('name', newCountry.value.name);
+  formData.append('continent', newCountry.value.continent);
+  formData.append('rank', newCountry.value.rank);
+  if (file.value) {
+    formData.append('image', file.value);
+  }
+  await axios.post('http://localhost:8080/api/country', formData).then(response => {
+    countries.value.push(response.data);
+    newCountry.value = { name: '', continent: '', rank: '' };
+    file.value = '';
+    fetchCountries();
+  }).catch(error => {
+    if (error.response && error.response.data) {
+      alert(error.response.data.error);
+    }
+    console.error(error);
+  });
+};
+const onFileChange = (event) =>{
+  file.value = event.target.files[0];
+};
+const getFlagUrl = (imagePath) => {
+  return `http://localhost:8080/${imagePath}`;
+};
+
+onMounted(()=> {
+  fetchCountries();
+});
+
+</script>
+
 <template>
   <div id="app">
     <h1>Country Management</h1>
     <form @submit.prevent="addCountry">
       <label>
         Country Name:
-        <input type="text" v-model="newCountry.name" />
+        <input type="text" v-model="newCountry.name" minlength="3" maxlength="20"/>
       </label>
       <label>
         Continent:
@@ -40,79 +100,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import axios from 'axios';
-
-export default {
-  data() {
-    return {
-      countries: [],
-      selectedCountryId: null,
-      countryDetails: null,
-      newCountry: {
-        name: '',
-        continent: '',
-        rank: '',
-      },
-      uniqueContinents: [],
-      file: null,
-    };
-  },
-  methods: {
-    fetchCountries() {
-      axios.get('http://localhost:8080/api/countries')
-        .then(response => {
-          this.countries = response.data;
-          this.uniqueContinents = [...new Set(this.countries.map(c => c.continent))];
-        })
-        .catch(error => console.error(error));
-    },
-    fetchCountryDetails() {
-      if (!this.selectedCountryId) return;
-
-      axios.get(`http://localhost:8080/api/country/${this.selectedCountryId}`)
-        .then(response => {
-          this.countryDetails = response.data;
-        })
-        .catch(error => console.error(error));
-    },
-    addCountry() {
-      const formData = new FormData();
-      formData.append('name', this.newCountry.name);
-      formData.append('continent', this.newCountry.continent);
-      formData.append('rank', this.newCountry.rank);
-      if (this.file) {
-        formData.append('image', this.file);
-      }
-
-      axios.post('http://localhost:8080/api/country', formData)
-        .then(response => {
-          this.countries.push(response.data);
-          this.newCountry = { name: '', continent: '', rank: '' };
-          this.file = "";
-          this.fetchCountries();
-        })
-        .catch(error => {
-          if (error.response && error.response.data) {
-            alert(error.response.data.error);
-          }
-          console.error(error);
-        });
-    },
-    onFileChange(event) {
-      this.file = event.target.files[0];
-    },
-    getFlagUrl(imagePath) {
-      // Adjust this function if your frontend is on a different port
-      return `http://localhost:8080/${imagePath}`;
-    }
-  },
-  mounted() {
-    this.fetchCountries();
-  },
-};
-</script>
 
 <style scoped>
   form {
