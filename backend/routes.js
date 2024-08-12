@@ -16,13 +16,15 @@ function writeData(data) {
 
 router.get('/countries', (req, res) => {
     const data = readData();
-    const countries = data.map(country => ({ id: country.id, name: country.name }));
+    const countriesData = data.countries
+    const countries = countriesData.map(country => ({ id: country.id, name: country.name }));
     res.json(countries);
 });
 
 router.get('/country/:id', (req, res) => {
     const data = readData();
-    const country = data.find(c => c.id === parseInt(req.params.id));
+    const countriesData = data.countries
+    const country = countriesData.find(c => c.id === parseInt(req.params.id));
     if (country) {
         res.json(country);
     } else {
@@ -32,25 +34,26 @@ router.get('/country/:id', (req, res) => {
 
 router.post('/country', upload.single('image'), (req, res) => {
     const data = readData();
+    const countriesData = data.countries
     const { name, continent, rank } = req.body;
     
-    if (data.some(c => c.name === name)) {
+    if (countriesData.some(c => c.name === name)) {
         return res.status(400).json({ error: 'Country name must be unique' });
     }
 
-    if (data.some(c => c.rank === parseInt(rank))) {
+    if (countriesData.some(c => c.rank === parseInt(rank))) {
         return res.status(400).json({ error: 'Rank must be unique' });
     }
 
     const newCountry = {
-        id: data.length + 1,
+        id: countriesData.length + 1,
         name,
         continent,
-        rank: parseInt(rank),
-        imageUrl: req.file ? `/images/${req.file.filename}` : null
+        flag: req.file ? `images/${req.file.filename}` : null,
+        rank: parseInt(rank)
     };
 
-    data.push(newCountry);
+    countriesData.push(newCountry);
     writeData(data);
 
     res.status(201).json(newCountry);

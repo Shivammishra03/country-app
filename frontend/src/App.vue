@@ -36,7 +36,7 @@
       <h3>{{ countryDetails.name }}</h3>
       <p>Continent: {{ countryDetails.continent }}</p>
       <p>Rank: {{ countryDetails.rank }}</p>
-      <img :src="getImageUrl(countryDetails.imageUrl)" alt="Country Image" v-if="countryDetails.imageUrl" />
+      <img :src="getFlagUrl(countryDetails.flag)" alt="Country Image" v-if="countryDetails.flag" />
     </div>
   </div>
 </template>
@@ -103,9 +103,9 @@ export default {
     onFileChange(event) {
       this.file = event.target.files[0];
     },
-    getImageUrl(imagePath) {
+    getFlagUrl(imagePath) {
       // Adjust this function if your frontend is on a different port
-      return `http://localhost:8080${imagePath}`;
+      return `http://localhost:8080/${imagePath}`;
     }
   },
   mounted() {
