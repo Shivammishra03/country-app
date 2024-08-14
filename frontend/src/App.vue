@@ -10,13 +10,20 @@ const newCountry = ref({
   continent: '',
   rank: '',
 });
-const uniqueContinents = ref([]);
+const uniqueContinents = ref([
+  'Asia', 
+  'Africa',
+  'Europe', 
+  'Australia/Oceania',
+  'Antartica', 
+  'South America', 
+  'North America'
+]);
 const file = ref('');
 
 const fetchCountries = async () => {
   await axios.get('http://localhost:8080/api/countries').then(response => {
     countries.value = response.data;
-    uniqueContinents.value = [...new Set(countries.value.map(c => c.continent))];
   }).catch(error => console.error(error));
 };
 const fetchCountryDetails = async () => {
@@ -46,7 +53,15 @@ const addCountry = async () => {
   });
 };
 const onFileChange = (event) =>{
-  file.value = event.target.files[0];
+  const imageFile = event.target.files[0];
+  let imageValues = document.getElementById('imageValue');
+  if (imageFile && (imageFile.type === 'image/jpeg' || imageFile.type === 'image/png') && imageFile.size <= 4 * 1024 * 1024) {
+    file.value = imageFile;
+  } else {
+    alert("Please upload maximum 4mb of image! ")
+    file.value = '';
+    imageValues.value = '';
+  }
 };
 const getFlagUrl = (imagePath) => {
   return `http://localhost:8080/${imagePath}`;
@@ -80,7 +95,7 @@ onMounted(()=> {
       </label>
       <label>
         Image:
-        <input type="file" @change="onFileChange" />
+        <input id="imageValue" type="file" @change="onFileChange" />
       </label>
       <button type="submit">Add Country</button>
     </form>
